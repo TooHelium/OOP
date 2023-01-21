@@ -1,0 +1,57 @@
+import math
+
+class Transformation:
+    
+    def get_name(self):
+        return type(self).__name__
+    
+    def do():
+        pass
+
+class Scale(Transformation):
+    
+    def do(image, ratio):
+        for y in range(image.height() - 1):
+            for x in range(image.width() - 1):
+    
+                u = x * (1.0 / ratio)
+                v = y * (1.0 / ratio)
+            
+                r, g, b = get_rgb(u, v)
+                set_rgb(x, y, r, g, b)
+
+class Jitter(Transformation):
+    
+    def do(image, amount = 10):     
+        for y in range(image.height() - 1):
+            for x in range(image.width() - 1):
+            
+                nx = x + (math.random() - 0.5) * amount
+                ny = y + (math.random() - 0.5) * amount
+            
+                r, g, b = image.get_rgb(nx, ny)
+                image.set_rgb(x, y, r, g, b)
+
+class Rotate(Transformation):
+    
+    def do(image, angle):
+        for y in range(image.height() - 1):
+            for x in range(image.width() - 1):
+            
+                u = x * math.cos(-angle) + y * math.sin(-angle)
+                v = y * math.cos(-angle) - x * math.sin(-angle)
+            
+                r, g, b = image.get_rgb(u, v)
+                image.set_rgb(x, y, r, g, b)
+
+class Translate(Transformation):
+    
+    def do(image, dx, dy):
+        for y in range(image.height() - 1):
+            for x in range(image.width() - 1):
+            
+                u = x - dx
+                v = y - dy
+            
+                r, g, b = image.get_rgb(u, v)
+                image.set_rgb(x, y, r, g, b)           
