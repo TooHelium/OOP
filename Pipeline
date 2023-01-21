@@ -1,0 +1,7 @@
+class Pipeline:
+
+    def process(history):
+        for task in history: 
+            filtor = globals()[task[0]] 
+            
+            filtor.do(data[0], data[1])
