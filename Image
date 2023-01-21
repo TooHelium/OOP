@@ -1,0 +1,45 @@
+from PIL import Image
+from numpy import asarray
+
+class Image:
+    
+    all_images = []
+    
+    def __init__(self, path, history = []):
+        self.__path = path
+        self.__image = image_to_array(Image.open(path))
+        self.__history = history
+        all_images.append(self._image)
+        
+    def image_to_array(image):
+        return asarray(image)
+    
+    def array_to_image(array):
+        return Image.fromarray(array)
+    
+    def get_rgb(self, x, y):
+        return self.__image[y][x]
+    
+    def set_rgb(self, x, y, r, g, b):
+        self.__image[y][x] = r, g, b
+        
+    def height(self):
+        return self.__image.shape[1]
+    
+    def width(self):
+        return self.__image.shape[0]
+    
+    def get_path(self):
+        return self.__path
+    
+    def get_history(self):
+        return self.__history
+    
+    def get_image(self):
+        return self.__image     #return as numpy array
+    
+    def expand_history(self, filtor, data):
+        self.__history.append([filtor, data])
+        
+    def make_new_branch(self):
+        return Image(self.get_path(), self.get_history())
