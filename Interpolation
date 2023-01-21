@@ -1,0 +1,81 @@
+import math
+
+class Interpolation:
+    
+    def do(image, ratio):
+        pass
+    
+    def get_rgb(image, x, y):
+        pass
+    
+    def get_name(self):
+        return type(self).__name__
+    
+class Bilinear(Interpolation):
+    
+    def do(image, ratio):
+        for y in range(image.height() - 1):
+            for x in range(image.width() - 1):
+                u = x * (1.0/ratio)
+                v = y * (1.0/ratio)
+        
+                r, g, b = get_rgb(image, u, v)
+                image.set_rgb(x, y, r, g, b)
+                
+    def get_rgb(image, x, y):
+        x0 = math.floor(x)
+        y0 = math.floor(y)
+        dx = x-x0
+        dy = y-y0
+        
+        r0, g0, b0 = image.get_rgb(x0,   y0)
+        r1, g1, b1 = image.get_rgb(x0+1, y0)
+        r2, g2, b2 = image.get_rgb(x0+1, y0+1)
+        r3, g3, b3 = image.get_rgb(x0,   y0+1)
+
+        r = lerp (lerp (r0, r1, dx), lerp (r3, r2, dx), dy)
+        g = lerp (lerp (g0, g1, dx), lerp (g3, g2, dx), dy)
+        b = lerp (lerp (b0, b1, dx), lerp (b3, b2, dx), dy)
+        
+        return r, g, b
+
+    def lerp(v1, v2, ratio):
+        return v1*(1-ratio) + v2*ratio
+
+
+class Bicubic(Interpolation):
+    
+    def do(image, ratio):
+        for y in range(image.height() - 1):
+            for x in range(image.width() - 1):
+                u = x * (1.0/ratio)
+                v = y * (1.0/ratio)
+        
+                r, g, b = get_rgb(image, u, v)
+                image.set_rgb(x, y, r, g, b)
+                
+    def get_rgb(image, x, y):
+        xi = math.floor(x)
+        yi = math.floor(y)
+        dx = x-xi
+        dy = y-yi
+
+        r0, g0, b0 = get_rgb_cubic_row(image, xi-1, yi-1, dx)
+        r1, g1, b1 = get_rgb_cubic_row(image, xi-1, yi,   dx)
+        r2, g2, b2 = get_rgb_cubic_row(image, xi-1, yi+1, dx)
+        r3, g3, b3 = get_rgb_cubic_row(image, xi-1, yi+2, dx)
+
+        return cubic(dy, r0, r1, r2, r3), cubic(dy, g0, g1, g2, g3), cubic(dy, b0, b1, b2, b3)
+                
+    def get_rgb_cubic_row(image, x, y, offset):
+        r0, g0, b0 = image.get_rgb(x,   y)
+        r1, g1, b1 = image.get_rgb(x+1, y)
+        r2, g2, b2 = image.get_rgb(x+2, y)
+        r3, g3, b3 = image.get_rgb(x+3, y)
+    
+        return cubic(offset, r0, r1, r2, r3), cubic(offset, g0, g1, g2, g3), cubic(offset, b0, b1, b2, b3)
+    
+    def cubic(offset, v0, v1, v2, v3):
+        return  (((( -7 * v0 + 21 * v1 - 21 * v2 + 7 * v3 ) * offset +
+                   ( 15 * v0 - 36 * v1 + 27 * v2 - 6 * v3 ) ) * offset +
+                   ( -9 * v0 + 9  * v2 ) ) * offset + (v0 + 16 * v1 + v2) ) / 18.0
